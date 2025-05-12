@@ -246,28 +246,24 @@ void daObjMarm_c::getBpartsOffset(cXyz* param_0) {
     mDoMtx_stack_c::multVec(param_0, param_0);
 }
 
-/* ############################################################################################## */
-/* 80592894-805928A0 00004C 000C+00 1/1 0/0 0/0 .rodata          l_offsetD$3657 */
-SECTION_RODATA static u8 const l_offsetD_3657[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x45, 0x1C, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x80592894, &l_offsetD_3657);
-
 /* 8058F3D4-8058F46C 0000F4 0098+00 1/1 0/0 0/0 .text getDpartsOffset__11daObjMarm_cFP4cXyz */
 void daObjMarm_c::getDpartsOffset(cXyz* param_0) {
-    // NONMATCHING
+    static Vec const l_offsetD = {0, 2500, 0};
+    *param_0 = l_offsetD;
+    mDoMtx_stack_c::transS(current.pos);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(field_0x9FE + field_0xA30);
+    mDoMtx_stack_c::multVec(param_0, param_0);
 }
-
-/* ############################################################################################## */
-/* 805928A0-805928AC 000058 000C+00 1/1 0/0 0/0 .rodata          l_offsetE$3668 */
-SECTION_RODATA static u8 const l_offsetE_3668[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x45, 0x1C, 0x40, 0x00, 0x44, 0xB6, 0x80, 0x00,
-};
-COMPILER_STRIP_GATE(0x805928A0, &l_offsetE_3668);
 
 /* 8058F46C-8058F504 00018C 0098+00 3/3 0/0 0/0 .text getEpartsOffset__11daObjMarm_cFP4cXyz */
 void daObjMarm_c::getEpartsOffset(cXyz* param_0) {
-    // NONMATCHING
+    static Vec const l_offsetE = {0, 2500, 1460};
+    *param_0 = l_offsetE;
+    mDoMtx_stack_c::transS(current.pos);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(field_0x9FE + field_0xA30);
+    mDoMtx_stack_c::multVec(param_0, param_0);
 }
 
 /* ############################################################################################## */

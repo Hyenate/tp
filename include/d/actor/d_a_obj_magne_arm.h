@@ -83,7 +83,11 @@ public:
     /* 805923C8 */ void Delete();
 
 private:
-    /* 0x568 */ u8 field_0x568[0xa6c - 0x568];
+    /* 0x568 */ u8 field_0x568[0x496];
+    /* 0x9FE */ s16 field_0x9FE;
+    /* 0xA00 */ u8 field_0xA00[0x30];
+    /* 0xA30 */ s16 field_0xA30;
+    /* 0xA32 */ u8 field_0xA32[0x3A];
 };
 
 STATIC_ASSERT(sizeof(daObjMarm_c) == 0xa6c);

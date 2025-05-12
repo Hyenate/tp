@@ -237,15 +237,13 @@ SECTION_RODATA static u8 const l_rot_speedY[8] = {
 COMPILER_STRIP_GATE(0x80592880, &l_rot_speedY);
 #pragma pop
 
-/* 80592888-80592894 000040 000C+00 1/1 0/0 0/0 .rodata          l_offsetB$3648 */
-SECTION_RODATA static u8 const l_offsetB_3648[12] = {
-    0xC3, 0x16, 0x00, 0x00, 0x44, 0x96, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x80592888, &l_offsetB_3648);
-
 /* 8058F358-8058F3D4 000078 007C+00 1/1 0/0 0/0 .text getBpartsOffset__11daObjMarm_cFP4cXyz */
 void daObjMarm_c::getBpartsOffset(cXyz* param_0) {
-    // NONMATCHING
+    static Vec const l_offsetB = {-150, 1200, 0};
+    *param_0 = l_offsetB;
+    mDoMtx_stack_c::transS(current.pos);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::multVec(param_0, param_0);
 }
 
 /* ############################################################################################## */

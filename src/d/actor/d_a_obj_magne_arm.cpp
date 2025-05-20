@@ -4,6 +4,10 @@
 */
 
 #include "d/actor/d_a_obj_magne_arm.h"
+#include "d/d_bg_w.h"
+#include "d/d_com_inf_game.h"
+#include "f_op/f_op_actor_mng.h"
+
 #include "dol2asm.h"
 
 
@@ -180,7 +184,6 @@ extern "C" extern void* __vt__14cCcD_ShapeAttr[22];
 extern "C" extern void* __vt__9cCcD_Stts[8];
 extern "C" u8 now__14mDoMtx_stack_c[48];
 extern "C" u8 mGndCheck__11fopAcM_gc_c[84];
-extern "C" extern u8 g_dComIfG_gameInfo[122384];
 extern "C" u8 mSimpleTexObj__21dDlst_shadowControl_c[32];
 extern "C" u8 sincosTable___5JMath[65536];
 extern "C" f32 mGroundY__11fopAcM_gc_c;
@@ -198,22 +201,10 @@ SECTION_RODATA static u8 const l_magne_scale[12] = {
 COMPILER_STRIP_GATE(0x80592848, &l_magne_scale);
 
 /* 80592854-80592864 00000C 0010+00 0/4 0/0 0/0 .rodata          l_trans */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static u8 const l_trans[16] = {
-    0x00, 0x00, 0x00, 0x00, 0x44, 0x83, 0x40, 0x00, 0x43, 0xE1, 0x00, 0x00, 0x44, 0x61, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x80592854, &l_trans);
-#pragma pop
+static f32 const l_trans[4] = {0.0f, 1050.0f, 450.0f, 900.0f};
 
 /* 80592864-80592874 00001C 0010+00 0/1 0/0 0/0 .rodata          l_down_length */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static u8 const l_down_length[16] = {
-    0x44, 0x89, 0x80, 0x00, 0x44, 0x48, 0x00, 0x00, 0x44, 0x89, 0x80, 0x00, 0x44, 0x48, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x80592864, &l_down_length);
-#pragma pop
+static f32 const l_down_length[4] = {1100.0f, 800.0f, 1100.0f, 800.0f};
 
 /* 80592874-8059287C 00002C 0008+00 0/6 0/0 0/0 .rodata          l_roll_speed */
 #pragma push
@@ -238,102 +229,129 @@ COMPILER_STRIP_GATE(0x80592880, &l_rot_speedY);
 #pragma pop
 
 /* 8058F358-8058F3D4 000078 007C+00 1/1 0/0 0/0 .text getBpartsOffset__11daObjMarm_cFP4cXyz */
-void daObjMarm_c::getBpartsOffset(cXyz* param_0) {
-    static Vec const l_offsetB = {-150, 1200, 0};
-    *param_0 = l_offsetB;
+void daObjMarm_c::getBpartsOffset(cXyz* i_BPartOffset) {
+    static Vec const l_offsetB = {-150.0f, 1200.0f, 0.0f};
+    *i_BPartOffset = l_offsetB;
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
-    mDoMtx_stack_c::multVec(param_0, param_0);
+    mDoMtx_stack_c::multVec(i_BPartOffset, i_BPartOffset);
 }
 
 /* 8058F3D4-8058F46C 0000F4 0098+00 1/1 0/0 0/0 .text getDpartsOffset__11daObjMarm_cFP4cXyz */
-void daObjMarm_c::getDpartsOffset(cXyz* param_0) {
-    static Vec const l_offsetD = {0, 2500, 0};
-    *param_0 = l_offsetD;
+void daObjMarm_c::getDpartsOffset(cXyz* i_DPartOffset) {
+    static Vec const l_offsetD = {0.0f, 2500.0f, 0.0f};
+    *i_DPartOffset = l_offsetD;
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
-    mDoMtx_stack_c::YrotM(field_0x9FE + field_0xA30);
-    mDoMtx_stack_c::multVec(param_0, param_0);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    mDoMtx_stack_c::multVec(i_DPartOffset, i_DPartOffset);
 }
 
 /* 8058F46C-8058F504 00018C 0098+00 3/3 0/0 0/0 .text getEpartsOffset__11daObjMarm_cFP4cXyz */
-void daObjMarm_c::getEpartsOffset(cXyz* param_0) {
-    static Vec const l_offsetE = {0, 2500, 1460};
-    *param_0 = l_offsetE;
+void daObjMarm_c::getEpartsOffset(cXyz* i_EPartOffset) {
+    static Vec const l_offsetE = {0.0f, 2500.0f, 1460.0f};
+    *i_EPartOffset = l_offsetE;
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
-    mDoMtx_stack_c::YrotM(field_0x9FE + field_0xA30);
-    mDoMtx_stack_c::multVec(param_0, param_0);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    mDoMtx_stack_c::multVec(i_EPartOffset, i_EPartOffset);
 }
 
 /* ############################################################################################## */
-/* 805928AC-805928B8 000064 000C+00 0/1 0/0 0/0 .rodata          l_offsetF$3679 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static u8 const l_offsetF_3679[12] = {
-    0x00, 0x00, 0x00, 0x00, 0x45, 0x1C, 0x40, 0x00, 0x44, 0xDE, 0x80, 0x00,
-};
-COMPILER_STRIP_GATE(0x805928AC, &l_offsetF_3679);
-#pragma pop
-
-/* 805928B8-805928C0 000070 0004+04 0/1 0/0 0/0 .rodata          @3689 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_3689[1 + 1 /* padding */] = {
-    2.0f,
-    /* padding */
-    0.0f,
-};
-COMPILER_STRIP_GATE(0x805928B8, &lit_3689);
-#pragma pop
-
-/* 805928C0-805928C8 000078 0008+00 0/7 0/0 0/0 .rodata          @3691 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static u8 const lit_3691[8] = {
-    0x43, 0x30, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
-};
-COMPILER_STRIP_GATE(0x805928C0, &lit_3691);
-#pragma pop
-
 /* 8058F504-8058F610 000224 010C+00 4/4 0/0 0/0 .text getFpartsOffset__11daObjMarm_cFP4cXyz */
-void daObjMarm_c::getFpartsOffset(cXyz* param_0) {
-    // NONMATCHING
+void daObjMarm_c::getFpartsOffset(cXyz* i_FPartOffset) {
+    static Vec const l_offsetF = {0.0f, 2500.0f, 1780.0f};
+    *i_FPartOffset = l_offsetF;
+    i_FPartOffset->y -= l_down_length[mDownLengthIndex];
+    i_FPartOffset->y += field_0xA04;
+    mDoMtx_stack_c::transS(current.pos);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    mDoMtx_stack_c::ZrotM(mFPartsOffsetZRot * 2.0f);
+    mDoMtx_stack_c::multVec(i_FPartOffset, i_FPartOffset);
 }
 
 /* ############################################################################################## */
-/* 805928C8-805928CC 000080 0004+00 1/8 0/0 0/0 .rodata          @3706 */
-SECTION_RODATA static u8 const lit_3706[4] = {
-    0x00,
-    0x00,
-    0x00,
-    0x00,
-};
-COMPILER_STRIP_GATE(0x805928C8, &lit_3706);
-
-/* 805928CC-805928D0 000084 0004+00 1/2 0/0 0/0 .rodata          @3707 */
-SECTION_RODATA static f32 const lit_3707 = 320.0f;
-COMPILER_STRIP_GATE(0x805928CC, &lit_3707);
-
 /* 8058F610-8058F6B4 000330 00A4+00 1/1 0/0 0/0 .text getRopeStartPos__11daObjMarm_cFP4cXyz */
-void daObjMarm_c::getRopeStartPos(cXyz* param_0) {
-    // NONMATCHING
+void daObjMarm_c::getRopeStartPos(cXyz* i_ropeStartPos) {
+    getEpartsOffset(i_ropeStartPos);
+    cXyz rope_start_pos(0.0f, 0.0f, 320.0f);
+    mDoMtx_stack_c::YrotS(mYRot1 + mYRot2);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::multVec(&rope_start_pos, &rope_start_pos);
+    *i_ropeStartPos += rope_start_pos;
 }
 
 /* 8058F6B4-8058F77C 0003D4 00C8+00 1/1 0/0 0/0 .text            initBaseMtx__11daObjMarm_cFv */
 void daObjMarm_c::initBaseMtx() {
-    // NONMATCHING
+    mpModel[0]->setBaseScale(scale);
+    mpModel[1]->setBaseScale(scale);
+    mpModel[2]->setBaseScale(scale);
+    mpModel[3]->setBaseScale(scale);
+    mpModel[4]->setBaseScale(scale);
+    mpModel[5]->setBaseScale(scale);
+    setBaseMtx();
 }
 
 /* 8058F77C-8058FA38 00049C 02BC+00 2/2 0/0 0/0 .text            setBaseMtx__11daObjMarm_cFv */
 void daObjMarm_c::setBaseMtx() {
-    // NONMATCHING
+    mDoMtx_stack_c::transS(current.pos);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    
+    mpModel[0]->setBaseTRMtx(mDoMtx_stack_c::get());
+    MTXCopy(mDoMtx_stack_c::get(), mBgMtx);
+    cXyz b_parts_offset;
+    getBpartsOffset(&b_parts_offset);
+    mDoMtx_stack_c::transS(b_parts_offset);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::XrotM(mBPartsXRot);
+    
+    mpModel[1]->setBaseTRMtx(mDoMtx_stack_c::get());
+    mDoMtx_stack_c::transS(current.pos);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    
+    mpModel[2]->setBaseTRMtx(mDoMtx_stack_c::get());
+    MTXCopy(mDoMtx_stack_c::get(), field_0x5D0);
+    cXyz d_parts_offset;
+    getDpartsOffset(&d_parts_offset);
+    mDoMtx_stack_c::transS(d_parts_offset);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    mDoMtx_stack_c::XrotM(mDPartsXRot);
+
+    mpModel[3]->setBaseTRMtx(mDoMtx_stack_c::get());
+    cXyz e_parts_offset;
+    getEpartsOffset(&e_parts_offset);
+    mDoMtx_stack_c::transS(e_parts_offset);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    mDoMtx_stack_c::XrotM(mEPartsXRot);
+
+    mpModel[4]->setBaseTRMtx(mDoMtx_stack_c::get());
+    cXyz f_parts_offset;
+    getFpartsOffset(&f_parts_offset);
+    mDoMtx_stack_c::transS(f_parts_offset);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    mDoMtx_stack_c::ZrotM(mFPartsZRot);
+
+    mpModel[5]->setBaseTRMtx(mDoMtx_stack_c::get());
+    MTXCopy(mDoMtx_stack_c::get(), field_0x634);
+    mDoMtx_stack_c::multVecZero(&attention_info.position);
+    eyePos = attention_info.position;
+    mDoMtx_stack_c::transS(current.pos);
+    mDoMtx_stack_c::YrotM(current.angle.y);
+    mDoMtx_stack_c::YrotM(mYRot1 + mYRot2);
+    MTXCopy(mDoMtx_stack_c::get(), field_0x600);
 }
 
 /* 8058FA38-8058FA50 000758 0018+00 1/1 0/0 0/0 .text
  * rideCallBack__FP4dBgWP10fopAc_ac_cP10fopAc_ac_c              */
-static void rideCallBack(dBgW* param_0, fopAc_ac_c* param_1, fopAc_ac_c* param_2) {
-    // NONMATCHING
+static void rideCallBack(dBgW* param_0, fopAc_ac_c* i_this, fopAc_ac_c* i_rideActor) {
+    if(fopAcM_GetName(i_rideActor) == PROC_ALINK) {
+        static_cast<daObjMarm_c*>(i_this)->field_0xA1D = 1;
+    }
 }
 
 /* ############################################################################################## */
@@ -373,24 +391,6 @@ SECTION_RODATA static u8 const l_offsetF_3738[12] = {
 COMPILER_STRIP_GATE(0x805928F4, &l_offsetF_3738);
 #pragma pop
 
-/* 80592900-80592904 0000B8 0004+00 0/2 0/0 0/0 .rodata          @3874 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_3874 = 25.5f;
-COMPILER_STRIP_GATE(0x80592900, &lit_3874);
-#pragma pop
-
-/* 80592904-80592908 0000BC 0004+00 0/1 0/0 0/0 .rodata          @3875 */
-#pragma push
-#pragma force_active on
-SECTION_RODATA static f32 const lit_3875 = 30.0f;
-COMPILER_STRIP_GATE(0x80592904, &lit_3875);
-#pragma pop
-
-/* 80592908-8059290C 0000C0 0004+00 1/3 0/0 0/0 .rodata          @3876 */
-SECTION_RODATA static f32 const lit_3876 = 10.0f;
-COMPILER_STRIP_GATE(0x80592908, &lit_3876);
-
 /* 80592970-80592970 000128 0000+00 0/0 0/0 0/0 .rodata          @stringBase0 */
 #pragma push
 #pragma force_active on
@@ -419,20 +419,84 @@ SECTION_DATA static u32 lit_1787[1 + 4 /* padding */] = {
 SECTION_DATA static void* l_arcName = (void*)&d_a_obj_magne_arm__stringBase0;
 
 /* 805929A4-805929BC 000024 0018+00 1/1 0/0 0/0 .data            l_cull_box */
-SECTION_DATA static u8 l_cull_box[24] = {
-    0xC3, 0xFA, 0x00, 0x00, 0xC5, 0x3B, 0x80, 0x00, 0xC3, 0xFA, 0x00, 0x00,
-    0x43, 0xFA, 0x00, 0x00, 0x45, 0x3B, 0x80, 0x00, 0x45, 0x1C, 0x40, 0x00,
+static Vec l_cull_box[2] = {
+    {-500.0f, -3000.0f, -500.0f}, 
+    {500.0f, 3000.0f, 2500.0f}
 };
 
 /* 805929BC-805929D4 00003C 0018+00 1/1 0/0 0/0 .data            l_cull_box2 */
-SECTION_DATA static u8 l_cull_box2[24] = {
-    0xC3, 0xFA, 0x00, 0x00, 0xC5, 0x7A, 0x00, 0x00, 0xC3, 0xFA, 0x00, 0x00,
-    0x43, 0xFA, 0x00, 0x00, 0x45, 0x3B, 0x80, 0x00, 0x45, 0x1C, 0x40, 0x00,
+static Vec l_cull_box2[2] = {
+    {-500.0f, -4000.0f, -500.0f}, 
+    {500.0f, 3000.0f, 2500.0f}
 };
 
+
 /* 8058FA50-8058FCF8 000770 02A8+00 1/0 0/0 0/0 .text            Create__11daObjMarm_cFv */
-void daObjMarm_c::Create() {
-    // NONMATCHING
+int daObjMarm_c::Create() {
+    calcHimo();
+    f32* size = field_0xA20->getSize(0);
+    for(int i = 0; i < field_0xA28; size++) {
+        *size = 25.5f;
+        i++;
+    }
+    size = field_0xA24->getSize(0);
+    for(int i = 0; i < field_0xA29; size++) {
+        *size = 25.5f;
+        i++;
+    }
+    field_0xA04 = -l_trans[mDownLengthIndex];
+    if(mDownLengthIndex == 0x3 || mDownLengthIndex == 0x1) {
+        field_0xA04 = 0;
+    }
+    
+    if(mDownLengthIndex == 0x1 || mDownLengthIndex == 0x3) {
+        field_0xA09 = -1;
+        field_0xA08 = 1;
+    }
+    else {
+        field_0xA09 = 1;
+        field_0xA08 = 0;
+    }
+    if (g_dComIfG_gameInfo.play.mBgs.Regist((dBgW_Base*)field_0x5CC, this) != NULL ||
+        g_dComIfG_gameInfo.play.mBgs.Regist((dBgW_Base*)field_0x630, this) != NULL) {
+        return 0;
+    }
+    field_0x5CC->SetCrrFunc(dBgS_MoveBGProc_Typical);
+    field_0x630->SetCrrFunc(dBgS_MoveBGProc_TypicalRotY);
+    fopAcM_SetMtx(this, field_0x600);
+    mAcchCir.SetWall(30.0f, 30.0f);
+    mAcch.Set(fopAcM_GetPosition_p(this), fopAcM_GetOldPosition_p(this), this, 1, 
+        &mAcchCir, fopAcM_GetSpeed_p(this), 0, 0);
+    if(mDownLengthIndex == 0x3) {
+        fopAcM_setCullSizeBox(this, l_cull_box2[0].x, l_cull_box2[0].y, l_cull_box2[0].z, 
+            l_cull_box2[1].x, l_cull_box2[1].y, l_cull_box2[1].z);
+    }
+    else {
+        fopAcM_setCullSizeBox(this, l_cull_box[0].x, l_cull_box[0].y, l_cull_box[0].z, 
+            l_cull_box[1].x, l_cull_box[1].y, l_cull_box[1].z);
+    }
+    fopAcM_setCullSizeFar(this, 10.0f);
+    field_0x5CC->Move();
+    field_0x630->Move();
+    switch(mDownLengthIndex) {
+        case 0:
+            init_typeA_modeWait();
+            break;
+        case 1:
+            mBPartsXRot -= 0x4000;
+            init_typeB_modeWait();
+            break;
+        case 2:
+            init_typeC_modeWait();
+            break;
+        case 3:
+            init_typeD_modeWait();
+            break;
+    }
+    field_0x630->SetRideCallback(rideCallBack); 
+    MoveBGExecute();
+    initBaseMtx();
+    return 1;
 }
 
 /* ############################################################################################## */
@@ -884,8 +948,9 @@ SECTION_DATA extern void* __vt__12J3DFrameCtrl[3] = {
 };
 
 /* 8058FCF8-805901FC 000A18 0504+00 1/0 0/0 0/0 .text            CreateHeap__11daObjMarm_cFv */
-void daObjMarm_c::CreateHeap() {
+int daObjMarm_c::CreateHeap() {
     // NONMATCHING
+    return 0;
 }
 
 /* 805901FC-80590244 000F1C 0048+00 1/0 0/0 0/0 .text            __dt__12J3DFrameCtrlFv */
@@ -1037,8 +1102,9 @@ COMPILER_STRIP_GATE(0x8059291C, &lit_4163);
 #pragma pop
 
 /* 80590504-80590818 001224 0314+00 1/0 0/0 0/0 .text            Execute__11daObjMarm_cFPPA3_A4_f */
-void daObjMarm_c::Execute(f32 (**param_0)[3][4]) {
+int daObjMarm_c::Execute(f32 (**param_0)[3][4]) {
     // NONMATCHING
+    return 0;
 }
 
 /* 80590818-80590B7C 001538 0364+00 1/1 0/0 0/0 .text            action__11daObjMarm_cFv */
@@ -1452,8 +1518,9 @@ COMPILER_STRIP_GATE(0x8059296C, &lit_4824);
 #pragma pop
 
 /* 80592088-805923C4 002DA8 033C+00 1/0 0/0 0/0 .text            Draw__11daObjMarm_cFv */
-void daObjMarm_c::Draw() {
+int daObjMarm_c::Draw() {
     // NONMATCHING
+    return 0;
 }
 
 /* 805923C4-805923C8 0030E4 0004+00 1/1 0/0 0/0 .text            debugDraw__11daObjMarm_cFv */
@@ -1462,8 +1529,9 @@ void daObjMarm_c::debugDraw() {
 }
 
 /* 805923C8-80592468 0030E8 00A0+00 1/0 0/0 0/0 .text            Delete__11daObjMarm_cFv */
-void daObjMarm_c::Delete() {
+int daObjMarm_c::Delete() {
     // NONMATCHING
+    return 0;
 }
 
 /* ############################################################################################## */

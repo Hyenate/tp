@@ -24,9 +24,12 @@ public:
     /* 80C93A88 */ void effectEnd();
     /* 80C93ADC */ void draw();
     /* 80C93CAC */ void _delete();
+    inline void setOn() {mSwitchIsOn = TRUE;}
 
 private:
-    /* 0x568 */ u8 field_0x568[0x734 - 0x568];
+    /* 0x568 */ u8 field_0x568[0x198];
+    /* 0x700 */ bool mSwitchIsOn;
+    /* 0x701 */ u8 field_0x701[0x33];
 };
 
 STATIC_ASSERT(sizeof(daObjMHole_c) == 0x734);

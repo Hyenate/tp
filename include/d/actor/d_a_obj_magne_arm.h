@@ -3,6 +3,7 @@
 
 #include "d/d_bg_s_acch.h"
 #include "d/d_bg_s_movebg_actor.h"
+#include "f_op/f_op_actor_mng.h"
 
 
 /**
@@ -24,11 +25,11 @@ public:
     /* 8058F77C */ void setBaseMtx();
     /* 8058FA50 */ int Create();
     /* 8058FCF8 */ int CreateHeap();
-    /* 80590244 */ void phase_0();
-    /* 805902D8 */ void phase_1();
-    /* 80590364 */ void phase_2();
+    /* 80590244 */ cPhs__Step phase_0();
+    /* 805902D8 */ cPhs__Step phase_1();
+    /* 80590364 */ cPhs__Step phase_2();
     /* 80590460 */ void create1st();
-    /* 80590504 */ int Execute(f32 (**)[3][4]);
+    /* 80590504 */ int Execute(Mtx**);
     /* 80590818 */ void action();
     /* 80590B7C */ void init_typeA_modeWait();
     /* 80590B8C */ void typeA_modeWait();
@@ -83,10 +84,15 @@ public:
     /* 80592088 */ int Draw();
     /* 805923C4 */ void debugDraw();
     /* 805923C8 */ int Delete();
-    
-    /* 0x5A0 */ u8 field_0x5A0[8];
+
+    inline u32 getMoveType(daObjMarm_c* pActor) {return fopAcM_GetParamBit(pActor, 8, 4);}
+    inline u32 getSwNo(daObjMarm_c* pActor) {return fopAcM_GetParamBit(pActor, 0, 8);}
+
+    /* 0x5A0 */ request_of_phase_process_class mPhase;
     /* 0x5A8 */ J3DModel* mpModel[6];
-    /* 0x5C0 */ u8 field_0x5C0[0xB];
+    /* 0x5C0 */ mDoExt_brkAnm* mpBrkAnm;
+    /* 0x5C4 */ mDoExt_btkAnm* mpBtkAnm;
+    /* 0x5C8 */ u8 field_0x5C8[0x4];
     /* 0x5CC */ dBgW* field_0x5CC;
     /* 0x5D0 */ Mtx field_0x5D0;
     /* 0x600 */ Mtx field_0x600;
@@ -94,33 +100,46 @@ public:
     /* 0x634 */ Mtx field_0x634;
     /* 0x664 */ dBgS_Acch mAcch;
     /* 0x83C */ dBgS_AcchCir mAcchCir;
-    /* 0x840 */ u8 field_0x840[0x180]; 
+    /* 0x840 */ u8 field_0x840[0x178];
+    /* 0x9F4 */ s32 field_0x9F4;
+    /* 0x9F8 */ u8 field_0x9F8[0x4];
     /* 0x9FC */ s16 mBPartsXRot;
     /* 0x9FE */ s16 mYRot1;
-    /* 0x9A0 */ s16 mDPartsXRot;
-    /* 0xA00 */ s16 mEPartsXRot;
+    /* 0xA00 */ s16 mDPartsXRot;
+    /* 0xA02 */ s16 mEPartsXRot;
     /* 0xA04 */ f32 field_0xA04;
     /* 0xA08 */ s8 field_0xA08;
     /* 0xA09 */ s8 field_0xA09;
     /* 0xA0A */ u8 field_0xA0A[0xB];
-    /* 0xA15 */ u8 mDownLengthIndex;
-    /* 0xA16 */ u8 field_0xA16[0x7];
+    /* 0xA15 */ u8 mMoveType;
+    /* 0xA16 */ u8 field_0xA16[0x2];
+    /* 0xA18 */ fpc_ProcID mID;
+    /* 0xA1C */ u8 mMode;
     /* 0xA1D */ u8 field_0xA1D;
     /* 0xA1E */ u8 field_0xA1E[0x2];
     /* 0xA20 */ mDoExt_3DlineMat1_c* field_0xA20;
     /* 0xA24 */ mDoExt_3DlineMat1_c* field_0xA24; 
     /* 0xA28 */ u8 field_0xA28;
     /* 0xA29 */ u8 field_0xA29;
-    /* 0xA29 */ u8 field_0xA2A[0x6];
+    /* 0xA29 */ u8 field_0xA2A[0x2];
+    /* 0xA2C */ f32 field_0xA2C;
     /* 0xA30 */ s16 mYRot2;
     /* 0xA32 */ s16 mFPartsZRot;
     /* 0xA34 */ u8 field_0xA34[0x4];
     /* 0xA38 */ s16 mFPartsOffsetZRot;
-    /* 0xA39 */ u8 field_0xA39[0x32];
+    /* 0xA3A */ u8 field_0xA39[0x2];
+    /* 0xA3C */ f32 field_0xA3C;
+    /* 0xA40 */ s16 field_0xA40;
+    /* 0xA42 */ u8 field_0xA42[0x2];
+    /* 0xA44 */ Vec field_0xA44;
+    /* 0xA50 */ Vec field_0xA50;
+    /* 0xA5C */ Vec field_0xA5C;
+    /* 0xA68 */ u8 field_0xA68[0x4];
+
 private:
+
 };
 
-//STATIC_ASSERT(sizeof(daObjMarm_c) == 0xa6c);
-
+STATIC_ASSERT(sizeof(daObjMarm_c) == 0xa6c);
 
 #endif /* D_A_OBJ_MAGNE_ARM_H */

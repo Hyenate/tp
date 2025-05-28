@@ -12,11 +12,35 @@
  * @class daObjMarm_c
  * @brief Magnetic Arm
  *
- * @details
- *
+ * @details Magnetic Arm Cranes in Goron Mines.
+ * Model is split into 6 moving parts labeled A through F.
+ * A Parts is the unmoving crane base.
+ * B Parts is the vertical gear moving the crane.
+ * C Parts is the main crane body.
+ * D Parts are the vertical gears at the top where the crane bends.
+ * E Parts is the wheel at the end of the crane.
+ * F Parts is the magnetic crane head accessible to Link.
+ * The rope connecting the crane head is identified separately.
  */
+
 class daObjMarm_c : public dBgS_MoveBgActor {
 public:
+    enum MOVETYPE_e {
+        MOVETYPE_A_e,
+        MOVETYPE_B_e,
+        MOVETYPE_C_e,
+        MOVETYPE_D_e
+    };
+
+    enum MODE_e {
+        MODE_WAIT_e,
+        MODE_MHOLE_ON_e,
+        MODE_LIFT_UP_e,
+        MODE_LIFT_DOWN_e,
+        MODE_ROTATE_e,
+        MODE_END_e
+    };
+
     /* 8058F358 */ void getBpartsOffset(cXyz*);
     /* 8058F3D4 */ void getDpartsOffset(cXyz*);
     /* 8058F46C */ void getEpartsOffset(cXyz*);
@@ -86,53 +110,54 @@ public:
     /* 805923C4 */ void debugDraw();
     /* 805923C8 */ int Delete();
 
-    inline u32 getMoveType(daObjMarm_c* pActor) {return fopAcM_GetParamBit(pActor, 8, 4);}
-    inline u32 getSwNo(daObjMarm_c* pActor) {return fopAcM_GetParamBit(pActor, 0, 8);}
+    u32 getMoveType() { return fopAcM_GetParamBit(this, 8, 4); }
+    u32 getSwNo() { return fopAcM_GetParamBit(this, 0, 8); }
+
 
     /* 0x5A0 */ request_of_phase_process_class mPhase;
     /* 0x5A8 */ J3DModel* mpModel[6];
     /* 0x5C0 */ mDoExt_brkAnm* mpBrkAnm;
     /* 0x5C4 */ mDoExt_btkAnm* mpBtkAnm;
     /* 0x5C8 */ JPABaseEmitter* mEmitter;
-    /* 0x5CC */ dBgW* field_0x5CC;
-    /* 0x5D0 */ Mtx field_0x5D0;
-    /* 0x600 */ Mtx field_0x600;
-    /* 0x630 */ dBgW* field_0x630;
-    /* 0x634 */ Mtx field_0x634;
+    /* 0x5CC */ dBgW* mpBgW1;
+    /* 0x5D0 */ Mtx mBgMtx1;
+    /* 0x600 */ Mtx mBgMtx2;
+    /* 0x630 */ dBgW* mpBgW2;
+    /* 0x634 */ Mtx mBgMtx3;
     /* 0x664 */ dBgS_ObjAcch mAcch;
     /* 0x83C */ dBgS_AcchCir mAcchCir;
     /* 0x87C */ dCcD_Stts unused_0x87C;
     /* 0x8B8 */ dCcD_Cyl unused_0x8B8;
-    /* 0x9F4 */ s32 field_0x9F4;
+    /* 0x9F4 */ s32 field_0x9F4;                ////myRotOffsetStep?
     /* 0x9F8 */ u8 unused_0x9F8[0x4];
     /* 0x9FC */ s16 mBPartsXRot;
-    /* 0x9FE */ s16 mYRot1;
+    /* 0x9FE */ s16 mCPartsYRot;
     /* 0xA00 */ s16 mDPartsXRot;
     /* 0xA02 */ s16 mEPartsXRot;
-    /* 0xA04 */ f32 field_0xA04;
-    /* 0xA08 */ u8 field_0xA08;
-    /* 0xA09 */ s8 field_0xA09;
-    /* 0xA0A */ s16 field_0xA0A;
-    /* 0xA0C */ s16 field_0xA0C;
-    /* 0xA10 */ s32 field_0xA10;
-    /* 0xA14 */ u8 field_0xA14;
+    /* 0xA04 */ f32 mUpLength;
+    /* 0xA08 */ u8 mIsYRotPositive;
+    /* 0xA09 */ s8 mYRotDirection;
+    /* 0xA0A */ s16 mRotationAngle;
+    /* 0xA0C */ s16 mLiftAngle;
+    /* 0xA10 */ s32 mRotationTotal;
+    /* 0xA14 */ u8 mMode;
     /* 0xA15 */ u8 mMoveType;
     /* 0xA16 */ u8 unused_0xA16;
-    /* 0xA17 */ u8 field_0xA17;
+    /* 0xA17 */ u8 mStopTimer;
     /* 0xA18 */ fpc_ProcID mID;
-    /* 0xA1C */ u8 mMode;
-    /* 0xA1D */ u8 field_0xA1D;
-    /* 0xA20 */ mDoExt_3DlineMat1_c* field_0xA20;
-    /* 0xA24 */ mDoExt_3DlineMat1_c* field_0xA24; 
-    /* 0xA28 */ u8 field_0xA28;
-    /* 0xA29 */ u8 field_0xA29;
-    /* 0xA2C */ f32 field_0xA2C;
-    /* 0xA30 */ s16 mYRot2;
-    /* 0xA32 */ s16 mFPartsZRot;
+    /* 0xA1C */ u8 mPhaseIndex;
+    /* 0xA1D */ u8 mPlayerRide;
+    /* 0xA20 */ mDoExt_3DlineMat1_c* mRope1;
+    /* 0xA24 */ mDoExt_3DlineMat1_c* mRope2; 
+    /* 0xA28 */ u8 field_0xA28;                 //mRope1 Line Count?
+    /* 0xA29 */ u8 field_0xA29;                 //mRope2 Line Count?
+    /* 0xA2C */ f32 field_0xA2C;                //myRotOffsetSpeed
+    /* 0xA30 */ s16 mYRotOffset;                //Animation follow through on hard stop
+    /* 0xA32 */ s16 mFPartsZRot;                //Added Animation follow through on crane head
     /* 0xA34 */ u8 unused_0xA34[0x4];
-    /* 0xA38 */ s16 mFPartsOffsetZRot;
-    /* 0xA3C */ f32 field_0xA3C;
-    /* 0xA40 */ s16 field_0xA40;
+    /* 0xA38 */ s16 mZRotOffset;
+    /* 0xA3C */ f32 field_0xA3C;                //mFPartsZRotSpeed?
+    /* 0xA40 */ s16 field_0xA40;                //mFPartsZRotStep?
     /* 0xA44 */ Vec mSePos1;
     /* 0xA50 */ Vec mSePos2;
     /* 0xA5C */ Vec mSePos3;

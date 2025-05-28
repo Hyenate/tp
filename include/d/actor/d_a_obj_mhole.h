@@ -24,7 +24,8 @@ public:
     /* 80C93A88 */ void effectEnd();
     /* 80C93ADC */ void draw();
     /* 80C93CAC */ void _delete();
-    inline void setOn() {mSwitchIsOn = TRUE;}
+
+    void setOn() {mSwitchIsOn = TRUE;}
 
 private:
     /* 0x568 */ u8 field_0x568[0x198];

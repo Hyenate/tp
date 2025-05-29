@@ -13,14 +13,14 @@
  * @brief Magnetic Arm
  *
  * @details Magnetic Arm Cranes in Goron Mines.
- * Model is split into 6 moving parts labeled A through F.
+ * The model is split into 6 parts labeled A through F.
  * A Parts is the unmoving crane base.
  * B Parts is the vertical gear moving the crane.
  * C Parts is the main crane body.
  * D Parts are the vertical gears at the top where the crane bends.
  * E Parts is the wheel at the end of the crane.
  * F Parts is the magnetic crane head accessible to Link.
- * The rope connecting the crane head is identified separately.
+ * The ropes connecting the crane head is identified separately.
  */
 
 class daObjMarm_c : public dBgS_MoveBgActor {
@@ -113,12 +113,11 @@ public:
     u32 getMoveType() { return fopAcM_GetParamBit(this, 8, 4); }
     u32 getSwNo() { return fopAcM_GetParamBit(this, 0, 8); }
 
-
     /* 0x5A0 */ request_of_phase_process_class mPhase;
     /* 0x5A8 */ J3DModel* mpModel[6];
     /* 0x5C0 */ mDoExt_brkAnm* mpBrkAnm;
     /* 0x5C4 */ mDoExt_btkAnm* mpBtkAnm;
-    /* 0x5C8 */ JPABaseEmitter* mEmitter;
+    /* 0x5C8 */ JPABaseEmitter* mpEmitter;
     /* 0x5CC */ dBgW* mpBgW1;
     /* 0x5D0 */ Mtx mBgMtx1;
     /* 0x600 */ Mtx mBgMtx2;
@@ -126,19 +125,19 @@ public:
     /* 0x634 */ Mtx mBgMtx3;
     /* 0x664 */ dBgS_ObjAcch mAcch;
     /* 0x83C */ dBgS_AcchCir mAcchCir;
-    /* 0x87C */ dCcD_Stts unused_0x87C;
-    /* 0x8B8 */ dCcD_Cyl unused_0x8B8;
-    /* 0x9F4 */ s32 field_0x9F4;                ////myRotOffsetStep?
+    /* 0x87C */ dCcD_Stts unused_0x87C;         // Declaration needed to generate vtables
+    /* 0x8B8 */ dCcD_Cyl unused_0x8B8;          // Declaration needed to generate vtables
+    /* 0x9F4 */ s32 mRotOffsetSwing;            // Stop animation swing rotation
     /* 0x9F8 */ u8 unused_0x9F8[0x4];
     /* 0x9FC */ s16 mBPartsXRot;
     /* 0x9FE */ s16 mCPartsYRot;
     /* 0xA00 */ s16 mDPartsXRot;
     /* 0xA02 */ s16 mEPartsXRot;
-    /* 0xA04 */ f32 mUpLength;
-    /* 0xA08 */ u8 mIsYRotPositive;
+    /* 0xA04 */ f32 mLiftTotal;
+    /* 0xA08 */ u8 mIsYRotForward;
     /* 0xA09 */ s8 mYRotDirection;
     /* 0xA0A */ s16 mRotationAngle;
-    /* 0xA0C */ s16 mLiftAngle;
+    /* 0xA0C */ s16 mLiftRotation;
     /* 0xA10 */ s32 mRotationTotal;
     /* 0xA14 */ u8 mMode;
     /* 0xA15 */ u8 mMoveType;
@@ -147,20 +146,20 @@ public:
     /* 0xA18 */ fpc_ProcID mID;
     /* 0xA1C */ u8 mPhaseIndex;
     /* 0xA1D */ u8 mPlayerRide;
-    /* 0xA20 */ mDoExt_3DlineMat1_c* mRope1;
-    /* 0xA24 */ mDoExt_3DlineMat1_c* mRope2; 
-    /* 0xA28 */ u8 field_0xA28;                 //mRope1 Line Count?
-    /* 0xA29 */ u8 field_0xA29;                 //mRope2 Line Count?
-    /* 0xA2C */ f32 field_0xA2C;                //myRotOffsetSpeed
-    /* 0xA30 */ s16 mYRotOffset;                //Animation follow through on hard stop
-    /* 0xA32 */ s16 mFPartsZRot;                //Added Animation follow through on crane head
+    /* 0xA20 */ mDoExt_3DlineMat1_c* mpRope1;
+    /* 0xA24 */ mDoExt_3DlineMat1_c* mpRope2; 
+    /* 0xA28 */ u8 field_0xA28;                 // mpRope1 Segment Count?
+    /* 0xA29 */ u8 field_0xA29;                 // mpRope2 Segment Count?
+    /* 0xA2C */ f32 mRotOffsetForce;            // Swing Force applied during stop animation
+    /* 0xA30 */ s16 mYRotOffset;                // Y rot Offset  on stop animation
+    /* 0xA32 */ s16 mFPartsZRot;                // F Parts Z rot on stop animation
     /* 0xA34 */ u8 unused_0xA34[0x4];
     /* 0xA38 */ s16 mZRotOffset;
-    /* 0xA3C */ f32 field_0xA3C;                //mFPartsZRotSpeed?
-    /* 0xA40 */ s16 field_0xA40;                //mFPartsZRotStep?
-    /* 0xA44 */ Vec mSePos1;
-    /* 0xA50 */ Vec mSePos2;
-    /* 0xA5C */ Vec mSePos3;
+    /* 0xA3C */ f32 mZRotForce;                 // Swing Force applied during stop animation
+    /* 0xA40 */ s16 mZRotSwing;                 // Stop animation swing rotation
+    /* 0xA44 */ Vec mSeMarmPos;
+    /* 0xA50 */ Vec mSeMarmLiftPos;
+    /* 0xA5C */ Vec mSeMarmSwingPos;
     /* 0xA68 */ u32 mShadowKey;
 };
 

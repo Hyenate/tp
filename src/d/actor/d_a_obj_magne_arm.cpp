@@ -11,10 +11,6 @@
 
 #include "dol2asm.h"
 
-//
-// Declarations:
-//
-
 /* ############################################################################################## */
 /* 80592848-80592854 000000 000C+00 15/15 0/0 0/0 .rodata          l_magne_scale */
 static u8 const l_magne_scale[12] = {
@@ -151,8 +147,8 @@ static u8 lit_1009[1];
 
 /* 8058F358-8058F3D4 000078 007C+00 1/1 0/0 0/0 .text getBpartsOffset__11daObjMarm_cFP4cXyz */
 void daObjMarm_c::getBpartsOffset(cXyz* i_BPartOffset) {
-    static Vec const l_offsetB = {-150.0f, 1200.0f, 0.0f};
-    *i_BPartOffset = l_offsetB;
+    static Vec const s_offsetB = {-150.0f, 1200.0f, 0.0f};
+    *i_BPartOffset = s_offsetB;
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
     mDoMtx_stack_c::multVec(i_BPartOffset, i_BPartOffset);
@@ -160,8 +156,8 @@ void daObjMarm_c::getBpartsOffset(cXyz* i_BPartOffset) {
 
 /* 8058F3D4-8058F46C 0000F4 0098+00 1/1 0/0 0/0 .text getDpartsOffset__11daObjMarm_cFP4cXyz */
 void daObjMarm_c::getDpartsOffset(cXyz* i_DPartOffset) {
-    static Vec const l_offsetD = {0.0f, 2500.0f, 0.0f};
-    *i_DPartOffset = l_offsetD;
+    static Vec const s_offsetD = {0.0f, 2500.0f, 0.0f};
+    *i_DPartOffset = s_offsetD;
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
     mDoMtx_stack_c::YrotM(mCPartsYRot + mYRotOffset);
@@ -170,8 +166,8 @@ void daObjMarm_c::getDpartsOffset(cXyz* i_DPartOffset) {
 
 /* 8058F46C-8058F504 00018C 0098+00 3/3 0/0 0/0 .text getEpartsOffset__11daObjMarm_cFP4cXyz */
 void daObjMarm_c::getEpartsOffset(cXyz* i_EPartOffset) {
-    static Vec const l_offsetE = {0.0f, 2500.0f, 1460.0f};
-    *i_EPartOffset = l_offsetE;
+    static Vec const s_offsetE = {0.0f, 2500.0f, 1460.0f};
+    *i_EPartOffset = s_offsetE;
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
     mDoMtx_stack_c::YrotM(mCPartsYRot + mYRotOffset);
@@ -181,10 +177,10 @@ void daObjMarm_c::getEpartsOffset(cXyz* i_EPartOffset) {
 /* ############################################################################################## */
 /* 8058F504-8058F610 000224 010C+00 4/4 0/0 0/0 .text getFpartsOffset__11daObjMarm_cFP4cXyz */
 void daObjMarm_c::getFpartsOffset(cXyz* i_FPartOffset) {
-    static Vec const l_offsetF = {0.0f, 2500.0f, 1780.0f};
-    *i_FPartOffset = l_offsetF;
+    static Vec const s_offsetF = {0.0f, 2500.0f, 1780.0f};
+    *i_FPartOffset = s_offsetF;
     i_FPartOffset->y -= l_down_length[mMoveType];
-    i_FPartOffset->y += mUpLength;
+    i_FPartOffset->y += mLiftTotal;
     mDoMtx_stack_c::transS(current.pos);
     mDoMtx_stack_c::YrotM(current.angle.y);
     mDoMtx_stack_c::YrotM(mCPartsYRot + mYRotOffset);
@@ -278,6 +274,9 @@ void rideCallBack(dBgW* param_0, fopAc_ac_c* i_this, fopAc_ac_c* i_rideActor) {
 /* 805929A0-805929A4 -00001 0004+00 3/3 0/0 0/0 .data            l_arcName */
 static char* l_arcName = "D_Marm";
 
+/* 80592977-8059297E 00012F 0007+00 0/0 0/0 0/0 .rodata          None */
+SECTION_DEAD static char const* const stringBase_80592977 = "D_MN54";
+
 /* 805929A4-805929BC 000024 0018+00 1/1 0/0 0/0 .data            l_cull_box */
 static Vec l_cull_box[2] = {{-500.0f, -3000.0f, -500.0f}, {500.0f, 3000.0f, 2500.0f}};
 
@@ -299,29 +298,29 @@ static Vec const l_offsetF = {0.0f, 1000.0f, 1760.0f};  // unused
 /* 8058FA50-8058FCF8 000770 02A8+00 1/0 0/0 0/0 .text            Create__11daObjMarm_cFv */
 int daObjMarm_c::Create() {
     calcHimo();
-    f32* size = mRope1->getSize(0);
+    f32* size = mpRope1->getSize(0);
     for (int i = 0; i < field_0xA28; size++) {
         *size = 25.5f;
         i++;
     }
 
-    size = mRope2->getSize(0);
+    size = mpRope2->getSize(0);
     for (int i = 0; i < field_0xA29; size++) {
         *size = 25.5f;
         i++;
     }
 
-    mUpLength = -l_trans[mMoveType];
+    mLiftTotal = -l_trans[mMoveType];
     if (mMoveType == MOVETYPE_D_e || mMoveType == MOVETYPE_B_e) {
-        mUpLength = 0;
+        mLiftTotal = 0;
     }
 
     if (mMoveType == MOVETYPE_B_e || mMoveType == MOVETYPE_D_e) {
         mYRotDirection = -1;
-        mIsYRotPositive = 1;
+        mIsYRotForward = 1;
     } else {
         mYRotDirection = 1;
-        mIsYRotPositive = 0;
+        mIsYRotForward = 0;
     }
 
     if (g_dComIfG_gameInfo.play.mBgs.Regist((dBgW_Base*)mpBgW1, this) != NULL ||
@@ -336,6 +335,7 @@ int daObjMarm_c::Create() {
     mAcchCir.SetWall(30.0f, 30.0f);
     mAcch.Set(fopAcM_GetPosition_p(this), fopAcM_GetOldPosition_p(this), this, 1, &mAcchCir,
               fopAcM_GetSpeed_p(this), 0, 0);
+
     if (mMoveType == MOVETYPE_D_e) {
         fopAcM_setCullSizeBox(this, l_cull_box2[0].x, l_cull_box2[0].y, l_cull_box2[0].z,
                               l_cull_box2[1].x, l_cull_box2[1].y, l_cull_box2[1].z);
@@ -367,6 +367,7 @@ int daObjMarm_c::Create() {
     mpBgW2->SetRideCallback(rideCallBack);
     MoveBGExecute();
     initBaseMtx();
+
     return TRUE;
 }
 
@@ -457,17 +458,17 @@ int daObjMarm_c::CreateHeap() {
     field_0xA28 = 2;
     field_0xA29 = 5;
 
-    mRope1 = new mDoExt_3DlineMat1_c();
-    mRope2 = new mDoExt_3DlineMat1_c();
-    if (mRope1 == NULL || mRope2 == NULL) {
+    mpRope1 = new mDoExt_3DlineMat1_c();
+    mpRope2 = new mDoExt_3DlineMat1_c();
+    if (mpRope1 == NULL || mpRope2 == NULL) {
         return FALSE;
     }
 
-    if (!mRope1->init(1, field_0xA28, (ResTIMG*)dComIfG_getObjectRes(l_arcName, 26), 1)) {
+    if (!mpRope1->init(1, field_0xA28, (ResTIMG*)dComIfG_getObjectRes(l_arcName, 26), 1)) {
         return FALSE;
     }
 
-    if (!mRope2->init(1, field_0xA29, (ResTIMG*)dComIfG_getObjectRes(l_arcName, 26), 1)) {
+    if (!mpRope2->init(1, field_0xA29, (ResTIMG*)dComIfG_getObjectRes(l_arcName, 26), 1)) {
         return FALSE;
     }
 
@@ -477,12 +478,11 @@ int daObjMarm_c::CreateHeap() {
 /* 80590244-805902D8 000F64 0094+00 1/0 0/0 0/0 .text            phase_0__11daObjMarm_cFv */
 cPhs__Step daObjMarm_c::phase_0() {
     mMoveType = getMoveType();
-    cPhs__Step phase = (cPhs__Step)dComIfG_resLoad(&mPhase, l_arcName);
-
+    int phase = dComIfG_resLoad(&mPhase, l_arcName);
     if (phase == cPhs_COMPLEATE_e) {
-        phase = (cPhs__Step)MoveBGCreate(l_arcName, 21, dBgS_MoveBGProc_Typical, 0x6000, NULL);
+        phase = MoveBGCreate(l_arcName, 21, dBgS_MoveBGProc_Typical, 0x6000, NULL);
         if (phase == cPhs_ERROR_e) {
-            return phase;
+            return (cPhs__Step)phase;
         }
         mPhaseIndex++;
     }
@@ -504,16 +504,16 @@ cPhs__Step daObjMarm_c::phase_1() {
 
 /* 80590364-80590460 001084 00FC+00 1/0 0/0 0/0 .text            phase_2__11daObjMarm_cFv */
 cPhs__Step daObjMarm_c::phase_2() {
-    daObjMHole_c* actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
-    if (actor != NULL) {
+    daObjMHole_c* m_hole_actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
+    if (m_hole_actor != NULL) {
         csXyz angle(0, 0, 0);
-        actor->home.angle = angle;
-        actor->current.angle = angle;
-        actor->shape_angle = angle;
+        m_hole_actor->home.angle = angle;
+        m_hole_actor->current.angle = angle;
+        m_hole_actor->shape_angle = angle;
         if (fopAcM_isSwitch(this, getSwNo())) {
-            actor->setOn();
+            m_hole_actor->setOn();
         }
-        fopAcM_setCullSizeFar(actor, 10.0f);
+        fopAcM_setCullSizeFar(m_hole_actor, 10.0f);
         mPhaseIndex++;
         return cPhs_COMPLEATE_e;
     }
@@ -535,7 +535,7 @@ int daObjMarm_c::create1st() {
 /* ############################################################################################## */
 /* 80590504-80590818 001224 0314+00 1/0 0/0 0/0 .text            Execute__11daObjMarm_cFPPA3_A4_f */
 int daObjMarm_c::Execute(Mtx** i_bgMtx) {
-    field_0x9F4++;
+    mRotOffsetSwing++;
     action();
 
     mCPartsYRot = -mBPartsXRot;
@@ -551,8 +551,8 @@ int daObjMarm_c::Execute(Mtx** i_bgMtx) {
     mpBrkAnm->play();
     mpBtkAnm->play();
 
-    daObjMHole_c* actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
-    if (actor != NULL) {
+    daObjMHole_c* m_hole_actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
+    if (m_hole_actor != NULL) {
         cXyz f_parts_offset;
         getFpartsOffset(&f_parts_offset);
 
@@ -561,27 +561,27 @@ int daObjMarm_c::Execute(Mtx** i_bgMtx) {
         mDoMtx_stack_c::ZrotM(mFPartsZRot);
         mDoMtx_stack_c::multVec(&offset, &offset);
         f_parts_offset += offset;
-        actor->home.pos = f_parts_offset;
-        actor->current.pos = f_parts_offset;
-        actor->shape_angle.y = current.angle.y + mCPartsYRot + mYRotOffset;
-        actor->shape_angle.z = mFPartsZRot;
+        m_hole_actor->home.pos = f_parts_offset;
+        m_hole_actor->current.pos = f_parts_offset;
+        m_hole_actor->shape_angle.y = current.angle.y + mCPartsYRot + mYRotOffset;
+        m_hole_actor->shape_angle.z = mFPartsZRot;
     }
-    mYRotOffset = field_0xA2C * cM_ssin(field_0x9F4 * 8000);
-    mZRotOffset = field_0xA2C * cM_ssin(field_0x9F4 * 4000);
-    cLib_addCalc0(&field_0xA2C, 0.1f, 20.0f);
+    mYRotOffset = mRotOffsetForce * cM_ssin(mRotOffsetSwing * 8000);
+    mZRotOffset = mRotOffsetForce * cM_ssin(mRotOffsetSwing * 4000);
+    cLib_addCalc0(&mRotOffsetForce, 0.1f, 20.0f);
 
-    field_0xA40++;
-    mFPartsZRot = field_0xA3C * cM_ssin(field_0xA40 * 3000);
-    cLib_addCalc0(&field_0xA3C, 0.05f, 10.0f);
+    mZRotSwing++;
+    mFPartsZRot = mZRotForce * cM_ssin(mZRotSwing * 3000);
+    cLib_addCalc0(&mZRotForce, 0.05f, 10.0f);
 
     mDoMtx_stack_c::copy((mpModel[1]->getBaseTRMtx()));
-    mDoMtx_stack_c::multVecZero(&mSePos1);
+    mDoMtx_stack_c::multVecZero(&mSeMarmPos);
     mDoMtx_stack_c::copy((mpModel[3]->getBaseTRMtx()));
-    mDoMtx_stack_c::multVecZero(&mSePos2);
+    mDoMtx_stack_c::multVecZero(&mSeMarmLiftPos);
     mDoMtx_stack_c::copy((mpModel[5]->getBaseTRMtx()));
-    mDoMtx_stack_c::multVecZero(&mSePos3);
+    mDoMtx_stack_c::multVecZero(&mSeMarmSwingPos);
 
-    mSePos3.y += -700.0f;
+    mSeMarmSwingPos.y += -700.0f;
     mPlayerRide = FALSE;
     dComIfGp_att_LookRequest(this, l_att_disXZ, l_att_high, l_att_low, l_att_ang, 1);
 
@@ -660,10 +660,11 @@ void daObjMarm_c::typeA_modeWait() {
 
 /* 80590BE0-80590C48 001900 0068+00 1/1 0/0 0/0 .text init_typeA_modeMholeOn__11daObjMarm_cFv */
 void daObjMarm_c::init_typeA_modeMholeOn() {
-    daObjMHole_c* actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
-    if (actor != NULL) {
-        actor->setOn();
+    daObjMHole_c* m_hole_actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
+    if (m_hole_actor != NULL) {
+        m_hole_actor->setOn();
     }
+
     setMagneHoleEffect();
     mStopTimer = 0;
     mMode = MODE_MHOLE_ON_e;
@@ -691,6 +692,7 @@ void daObjMarm_c::init_typeA_modeRotate() {
     if (mPlayerRide != FALSE) {
         mStopTimer *= 1.5f;
     }
+
     mRotationAngle = 0;
     mRotationTotal = 0;
     mMode = MODE_ROTATE_e;
@@ -705,29 +707,32 @@ void daObjMarm_c::typeA_modeRotate() {
         if (stop_timer != 0) {
             seStart_MOVESTART();
         }
+
         s16 rot_speedY = l_rot_speedY[0];
         if (mYRotDirection == -1) {
             rot_speedY = -l_rot_speedY[0];
         }
+
         cLib_addCalcAngleS(&mRotationAngle, rot_speedY, 20, 50, 10);
         mBPartsXRot -= mRotationAngle;
         mRotationTotal += abs(mRotationAngle);
         if (mRotationTotal > 0x4000) {
             setMagneHoleEffect();
-            mIsYRotPositive += mYRotDirection;
-            if (mIsYRotPositive == 0) {
+            mIsYRotForward += mYRotDirection;
+            if (mIsYRotForward == 0) {
                 mYRotDirection = 1;
-            } else if (mIsYRotPositive == 2) {
+            } else if (mIsYRotForward == 2) {
                 mYRotDirection = -1;
             }
-            field_0xA2C = 150.0f;
-            field_0xA3C = 800.0f;
-            field_0xA40 = 0;
+            mRotOffsetForce = 150.0f;
+            mZRotForce = 800.0f;
+            mZRotSwing = 0;
 
             init_typeA_modeRotate();
             seStart_SWING();
             seStart_STOP();
         }
+
         seStartLevel_MOVE();
     }
 }
@@ -752,10 +757,11 @@ void daObjMarm_c::typeB_modeWait() {
 
 /* 80590E8C-80590EF4 001BAC 0068+00 1/1 0/0 0/0 .text init_typeB_modeMholeOn__11daObjMarm_cFv */
 void daObjMarm_c::init_typeB_modeMholeOn() {
-    daObjMHole_c* actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
-    if (actor != NULL) {
-        actor->setOn();
+    daObjMHole_c* m_hole_actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
+    if (m_hole_actor != NULL) {
+        m_hole_actor->setOn();
     }
+
     setMagneHoleEffect();
     mStopTimer = 0;
     mMode = MODE_MHOLE_ON_e;
@@ -769,7 +775,7 @@ void daObjMarm_c::typeB_modeMholeOn() {
 /* 80590F14-80590F30 001C34 001C+00 1/1 0/0 0/0 .text init_typeB_modeLiftUp__11daObjMarm_cFv */
 void daObjMarm_c::init_typeB_modeLiftUp() {
     mStopTimer = 30;
-    mLiftAngle = 0;
+    mLiftRotation = 0;
     mMode = MODE_LIFT_UP_e;
 }
 
@@ -777,11 +783,11 @@ void daObjMarm_c::init_typeB_modeLiftUp() {
 /* 80590F30-80591004 001C50 00D4+00 1/0 0/0 0/0 .text            typeB_modeLiftUp__11daObjMarm_cFv */
 void daObjMarm_c::typeB_modeLiftUp() {
     if (cLib_calcTimer(&mStopTimer) == 0) {
-        cLib_addCalcAngleS(&mLiftAngle, l_roll_speed[1], 20, 50, 10);
-        mDPartsXRot += mLiftAngle;
-        mUpLength += mLiftAngle * 1884.9557f / 65536.0f;
-        if (mUpLength > 0.0f) {
-            mUpLength = 0.0f;
+        cLib_addCalcAngleS(&mLiftRotation, l_roll_speed[1], 20, 50, 10);
+        mDPartsXRot += mLiftRotation;
+        mLiftTotal += mLiftRotation * 1884.9557f / 65536.0f;
+        if (mLiftTotal > 0.0f) {
+            mLiftTotal = 0.0f;
             init_typeB_modeRotate();
         }
         seStartLevel_UP();
@@ -791,11 +797,11 @@ void daObjMarm_c::typeB_modeLiftUp() {
 /* 80591004-805910E8 001D24 00E4+00 1/0 0/0 0/0 .text            typeB_modeLiftDown__11daObjMarm_cFv */
 void daObjMarm_c::typeB_modeLiftDown() {
     if (cLib_calcTimer(&mStopTimer) == 0) {
-        cLib_addCalcAngleS(&mLiftAngle, l_roll_speed[1], 20, 50, 10);
-        mDPartsXRot -= mLiftAngle;
-        mUpLength -= mLiftAngle * 1884.9557f / 65536.0f;
-        if (mUpLength < -l_trans[mMoveType]) {
-            mUpLength = -l_trans[mMoveType];
+        cLib_addCalcAngleS(&mLiftRotation, l_roll_speed[1], 20, 50, 10);
+        mDPartsXRot -= mLiftRotation;
+        mLiftTotal -= mLiftRotation * 1884.9557f / 65536.0f;
+        if (mLiftTotal < -l_trans[mMoveType]) {
+            mLiftTotal = -l_trans[mMoveType];
             init_typeB_modeLiftUp();
         }
         seStartLevel_DOWN();
@@ -808,6 +814,7 @@ void daObjMarm_c::init_typeB_modeRotate() {
     if (mPlayerRide != FALSE) {
         mStopTimer *= 1.5f;
     }
+
     mRotationAngle = 0;
     mRotationTotal = 0;
     mMode = MODE_ROTATE_e;
@@ -820,25 +827,27 @@ void daObjMarm_c::typeB_modeRotate() {
         if (stop_timer != 0) {
             seStart_MOVESTART();
         }
+
         endMagneHoleEffect();
         s16 rot_speedY = l_rot_speedY[1];
         if (mYRotDirection == -1) {
             rot_speedY = -l_rot_speedY[1];
         }
+
         cLib_addCalcAngleS(&mRotationAngle, rot_speedY, 20, 50, 10);
         mBPartsXRot -= mRotationAngle;
         mRotationTotal += abs(mRotationAngle);
         if (mRotationTotal > 0x4000) {
             setMagneHoleEffect();
-            field_0xA2C = 150.0f;
-            field_0xA3C = 800.0f;
-            field_0xA40 = 0;
-            mIsYRotPositive += mYRotDirection;
+            mRotOffsetForce = 150.0f;
+            mZRotForce = 800.0f;
+            mZRotSwing = 0;
+            mIsYRotForward += mYRotDirection;
             
-            if (mIsYRotPositive == 0) {
+            if (mIsYRotForward == 0) {
                 mYRotDirection = 1;
                 init_typeB_modeRotate();
-            } else if (mIsYRotPositive == 1) {
+            } else if (mIsYRotForward == 1) {
                 mYRotDirection = -1;
                 init_typeB_modeRotate();
             }
@@ -846,6 +855,7 @@ void daObjMarm_c::typeB_modeRotate() {
             seStart_SWING();
             seStart_STOP();
         }
+
         seStartLevel_MOVE();
     }
 }
@@ -870,10 +880,11 @@ void daObjMarm_c::typeC_modeWait() {
 
 /* 80591314-8059137C 002034 0068+00 1/1 0/0 0/0 .text init_typeC_modeMholeOn__11daObjMarm_cFv */
 void daObjMarm_c::init_typeC_modeMholeOn() {
-    daObjMHole_c* actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
-    if (actor != NULL) {
-        actor->setOn();
+    daObjMHole_c* m_hole_actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
+    if (m_hole_actor != NULL) {
+        m_hole_actor->setOn();
     }
+
     setMagneHoleEffect();
     mStopTimer = 0;
     mMode = MODE_MHOLE_ON_e;
@@ -887,7 +898,7 @@ void daObjMarm_c::typeC_modeMholeOn() {
 /* 8059139C-805913B8 0020BC 001C+00 2/2 0/0 0/0 .text init_typeC_modeLiftUp__11daObjMarm_cFv */
 void daObjMarm_c::init_typeC_modeLiftUp() {
     mStopTimer = 30;
-    mLiftAngle = 0;
+    mLiftRotation = 0;
     mMode = MODE_LIFT_UP_e;
 }
 
@@ -895,11 +906,11 @@ void daObjMarm_c::init_typeC_modeLiftUp() {
  */
 void daObjMarm_c::typeC_modeLiftUp() {
     if (cLib_calcTimer(&mStopTimer) == 0) {
-        cLib_addCalcAngleS(&mLiftAngle, l_roll_speed[2], 20, 50, 10);
-        mDPartsXRot += mLiftAngle;
-        mUpLength += mLiftAngle * 1884.9557f / 65536.0f;
-        if (mUpLength > 0.0f) {
-            mUpLength = 0.0f;
+        cLib_addCalcAngleS(&mLiftRotation, l_roll_speed[2], 20, 50, 10);
+        mDPartsXRot += mLiftRotation;
+        mLiftTotal += mLiftRotation * 1884.9557f / 65536.0f;
+        if (mLiftTotal > 0.0f) {
+            mLiftTotal = 0.0f;
             init_typeC_modeRotate();
         }
         seStartLevel_UP();
@@ -909,18 +920,18 @@ void daObjMarm_c::typeC_modeLiftUp() {
 /* 8059148C-805914A8 0021AC 001C+00 1/1 0/0 0/0 .text init_typeC_modeLiftDown__11daObjMarm_cFv */
 void daObjMarm_c::init_typeC_modeLiftDown() {
     mStopTimer = 30;
-    mLiftAngle = 0;
+    mLiftRotation = 0;
     mMode = MODE_LIFT_DOWN_e;
 }
 
 /* 805914A8-8059158C 0021C8 00E4+00 1/0 0/0 0/0 .text            typeC_modeLiftDown__11daObjMarm_cFv */
 void daObjMarm_c::typeC_modeLiftDown() {
     if (cLib_calcTimer(&mStopTimer) == 0) {
-        cLib_addCalcAngleS(&mLiftAngle, l_roll_speed[2], 20, 50, 10);
-        mDPartsXRot -= mLiftAngle;
-        mUpLength -= mLiftAngle * 1884.9557f / 65536.0f;
-        if (mUpLength < -l_trans[mMoveType]) {
-            mUpLength = -l_trans[mMoveType];
+        cLib_addCalcAngleS(&mLiftRotation, l_roll_speed[2], 20, 50, 10);
+        mDPartsXRot -= mLiftRotation;
+        mLiftTotal -= mLiftRotation * 1884.9557f / 65536.0f;
+        if (mLiftTotal < -l_trans[mMoveType]) {
+            mLiftTotal = -l_trans[mMoveType];
             init_typeC_modeLiftUp();
         }
         seStartLevel_DOWN();
@@ -933,6 +944,7 @@ void daObjMarm_c::init_typeC_modeRotate() {
     if (mPlayerRide != FALSE) {
         mStopTimer *= 1.5f;
     }
+
     mRotationAngle = 0;
     mRotationTotal = 0;
     mMode = MODE_ROTATE_e;
@@ -946,24 +958,26 @@ void daObjMarm_c::typeC_modeRotate() {
         if (stop_timer != 0) {
             seStart_MOVESTART();
         }
+
         s16 rot_speedY = l_rot_speedY[2];
         if (mYRotDirection == -1) {
             rot_speedY = -l_rot_speedY[2];
         }
+
         cLib_addCalcAngleS(&mRotationAngle, rot_speedY, 20, 50, 10);
         mBPartsXRot -= mRotationAngle;
         mRotationTotal += abs(mRotationAngle);
         if (mRotationTotal > 0x4000) {
             setMagneHoleEffect();
-            field_0xA2C = 150.0f;
-            field_0xA3C = 800.0f;
-            field_0xA40 = 0;
-            mIsYRotPositive += mYRotDirection;
+            mRotOffsetForce = 150.0f;
+            mZRotForce = 800.0f;
+            mZRotSwing = 0;
+            mIsYRotForward += mYRotDirection;
 
-            if (mIsYRotPositive == 0) {
+            if (mIsYRotForward == 0) {
                 mYRotDirection = 1;
                 init_typeC_modeLiftDown();
-            } else if (mIsYRotPositive == 1) {
+            } else if (mIsYRotForward == 1) {
                 mYRotDirection = -1;
                 init_typeB_modeRotate();
             }
@@ -971,6 +985,7 @@ void daObjMarm_c::typeC_modeRotate() {
             seStart_SWING();
             seStart_STOP();
         }
+
         seStartLevel_MOVE();
     }
 }
@@ -995,10 +1010,11 @@ void daObjMarm_c::typeD_modeWait() {
 
 /* 805917B8-80591820 0024D8 0068+00 1/1 0/0 0/0 .text init_typeD_modeMholeOn__11daObjMarm_cFv */
 void daObjMarm_c::init_typeD_modeMholeOn() {
-    daObjMHole_c* actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
-    if (actor != NULL) {
-        actor->setOn();
+    daObjMHole_c* m_hole_actor = (daObjMHole_c*)fopAcM_SearchByID(mID);
+    if (m_hole_actor != NULL) {
+        m_hole_actor->setOn();
     }
+
     setMagneHoleEffect();
     mStopTimer = 0;
     mMode = MODE_MHOLE_ON_e;
@@ -1013,18 +1029,18 @@ void daObjMarm_c::typeD_modeMholeOn() {
 /* 80591840-8059185C 002560 001C+00 1/1 0/0 0/0 .text init_typeD_modeLiftUp__11daObjMarm_cFv */
 void daObjMarm_c::init_typeD_modeLiftUp() {
     mStopTimer = 30;
-    mLiftAngle = 0;
+    mLiftRotation = 0;
     mMode = MODE_LIFT_UP_e;
 }
 
 /* 8059185C-80591930 00257C 00D4+00 1/0 0/0 0/0 .text            typeD_modeLiftUp__11daObjMarm_cFv */
 void daObjMarm_c::typeD_modeLiftUp() {
     if (cLib_calcTimer(&mStopTimer) == 0) {
-        cLib_addCalcAngleS(&mLiftAngle, l_roll_speed[3], 20, 50, 10);
-        mDPartsXRot += mLiftAngle;
-        mUpLength += mLiftAngle * 1884.9557f / 65536.0f;
-        if (mUpLength > 0.0f) {
-            mUpLength = 0.0f;
+        cLib_addCalcAngleS(&mLiftRotation, l_roll_speed[3], 20, 50, 10);
+        mDPartsXRot += mLiftRotation;
+        mLiftTotal += mLiftRotation * 1884.9557f / 65536.0f;
+        if (mLiftTotal > 0.0f) {
+            mLiftTotal = 0.0f;
             init_typeD_modeRotate();
         }
         seStartLevel_UP();
@@ -1034,20 +1050,21 @@ void daObjMarm_c::typeD_modeLiftUp() {
 /* 80591930-8059194C 002650 001C+00 1/1 0/0 0/0 .text init_typeD_modeLiftDown__11daObjMarm_cFv */
 void daObjMarm_c::init_typeD_modeLiftDown() {
     mStopTimer = 30;
-    mLiftAngle = 0;
+    mLiftRotation = 0;
     mMode = MODE_LIFT_DOWN_e;
 }
 
 /* 8059194C-80591A30 00266C 00E4+00 1/0 0/0 0/0 .text            typeD_modeLiftDown__11daObjMarm_cFv */
 void daObjMarm_c::typeD_modeLiftDown() {
     if (cLib_calcTimer(&mStopTimer) == 0) {
-        cLib_addCalcAngleS(&mLiftAngle, l_roll_speed[3], 20, 50, 10);
-        mDPartsXRot -= mLiftAngle;
-        mUpLength -= mLiftAngle * 1884.9557f / 65536.0f;
-        if (mUpLength < -l_trans[mMoveType]) {
-            mUpLength = -l_trans[mMoveType];
+        cLib_addCalcAngleS(&mLiftRotation, l_roll_speed[3], 20, 50, 10);
+        mDPartsXRot -= mLiftRotation;
+        mLiftTotal -= mLiftRotation * 1884.9557f / 65536.0f;
+        if (mLiftTotal < -l_trans[mMoveType]) {
+            mLiftTotal = -l_trans[mMoveType];
             init_typeD_modeLiftUp();
         }
+
         seStartLevel_DOWN();
     }
 }
@@ -1058,6 +1075,7 @@ void daObjMarm_c::init_typeD_modeRotate() {
     if (mPlayerRide != FALSE) {
         mStopTimer *= 1.5f;
     }
+
     mRotationAngle = 0;
     mRotationTotal = 0;
     mMode = MODE_ROTATE_e;
@@ -1071,24 +1089,26 @@ void daObjMarm_c::typeD_modeRotate() {
         if (stop_timer != 0) {
             seStart_MOVESTART();
         }
+
         s16 rot_speedY = l_rot_speedY[3];
         if (mYRotDirection == -1) {
             rot_speedY = -l_rot_speedY[3];
         }
+
         cLib_addCalcAngleS(&mRotationAngle, rot_speedY, 20, 50, 10);
         mBPartsXRot -= mRotationAngle;
         mRotationTotal += abs(mRotationAngle);
         if (mRotationTotal > 0x4000) {
             setMagneHoleEffect();
-            field_0xA2C = 150.0f;
-            field_0xA3C = 800.0f;
-            field_0xA40 = 0;
-            mIsYRotPositive += mYRotDirection;
+            mRotOffsetForce = 150.0f;
+            mZRotForce = 800.0f;
+            mZRotSwing = 0;
+            mIsYRotForward += mYRotDirection;
 
-            if (mIsYRotPositive == 0) {
+            if (mIsYRotForward == 0) {
                 mYRotDirection = 1;
                 init_typeD_modeLiftDown();
-            } else if (mIsYRotPositive == 1) {
+            } else if (mIsYRotForward == 1) {
                 mYRotDirection = -1;
                 init_typeD_modeRotate();
             }
@@ -1096,6 +1116,7 @@ void daObjMarm_c::typeD_modeRotate() {
             seStart_SWING();
             seStart_STOP();
         }
+
         seStartLevel_MOVE();
     }
 }
@@ -1112,10 +1133,10 @@ void daObjMarm_c::setMagneHoleEffect() {
 
 /* 80591BFC-80591C38 00291C 003C+00 5/5 0/0 0/0 .text            endMagneHoleEffect__11daObjMarm_cFv */
 void daObjMarm_c::endMagneHoleEffect() {
-    if (mEmitter != NULL) {
-        mEmitter->becomeInvalidEmitter();
-        mEmitter->quitImmortalEmitter();
-        mEmitter = NULL;
+    if (mpEmitter != NULL) {
+        mpEmitter->becomeInvalidEmitter();
+        mpEmitter->quitImmortalEmitter();
+        mpEmitter = NULL;
     }
 }
 
@@ -1129,7 +1150,7 @@ void daObjMarm_c::calcHimo() {
     getFpartsOffset(&offset2);
     fabs(offset1.y - offset2.y);
 
-    cXyz* line_mat1_pos = mRope1->getPos(0);
+    cXyz* line_mat1_pos = mpRope1->getPos(0);
     *line_mat1_pos = offset1;
     line_mat1_pos++;
     for (int i = 1; i < field_0xA28; line_mat1_pos++) {
@@ -1153,7 +1174,7 @@ void daObjMarm_c::calcHimo() {
         line_offsets[i] += offset1;
     }
 
-    line_mat1_pos = mRope2->getPos(0);
+    line_mat1_pos = mpRope2->getPos(0);
     for (int i = 0; i < field_0xA29; line_mat1_pos++) {
         *line_mat1_pos = line_offsets[i];
         i++;
@@ -1163,32 +1184,32 @@ void daObjMarm_c::calcHimo() {
 /* ############################################################################################## */
 /* 80591E18-80591E80 002B38 0068+00 4/4 0/0 0/0 .text            seStart_MOVESTART__11daObjMarm_cFv */
 void daObjMarm_c::seStart_MOVESTART() {
-    mDoAud_seStart(Z2SE_OBJ_MAGNEARM_MOVESTART, &mSePos1, 0, 0);
+    mDoAud_seStart(Z2SE_OBJ_MAGNEARM_MOVESTART, &mSeMarmPos, 0, 0);
 }
 
 /* 80591E80-80591EE8 002BA0 0068+00 4/4 0/0 0/0 .text            seStartLevel_MOVE__11daObjMarm_cFv */
 void daObjMarm_c::seStartLevel_MOVE() {
-    mDoAud_seStartLevel(Z2SE_OBJ_MAGNEARM_MOVE, &mSePos1, 0, 0);
+    mDoAud_seStartLevel(Z2SE_OBJ_MAGNEARM_MOVE, &mSeMarmPos, 0, 0);
 }
 
 /* 80591EE8-80591F50 002C08 0068+00 4/4 0/0 0/0 .text            seStart_STOP__11daObjMarm_cFv */
 void daObjMarm_c::seStart_STOP() {
-    mDoAud_seStart(Z2SE_OBJ_MAGNEARM_STOP, &mSePos1, 0, 0);
+    mDoAud_seStart(Z2SE_OBJ_MAGNEARM_STOP, &mSeMarmPos, 0, 0);
 }
 
 /* 80591F50-80591FB8 002C70 0068+00 3/3 0/0 0/0 .text            seStartLevel_UP__11daObjMarm_cFv */
 void daObjMarm_c::seStartLevel_UP() {
-    mDoAud_seStartLevel(Z2SE_OBJ_MAGNEARM_UP, &mSePos2, 0, 0);
+    mDoAud_seStartLevel(Z2SE_OBJ_MAGNEARM_UP, &mSeMarmLiftPos, 0, 0);
 }
 
 /* 80591FB8-80592020 002CD8 0068+00 3/3 0/0 0/0 .text            seStartLevel_DOWN__11daObjMarm_cFv */
 void daObjMarm_c::seStartLevel_DOWN() {
-    mDoAud_seStartLevel(Z2SE_OBJ_MAGNEARM_DOWN, &mSePos2, 0, 0);
+    mDoAud_seStartLevel(Z2SE_OBJ_MAGNEARM_DOWN, &mSeMarmLiftPos, 0, 0);
 }
 
 /* 80592020-80592088 002D40 0068+00 4/4 0/0 0/0 .text            seStart_SWING__11daObjMarm_cFv */
 void daObjMarm_c::seStart_SWING() {
-    mDoAud_seStart(Z2SE_OBJ_MAGNEARM_SWING, &mSePos3, 0, 0);
+    mDoAud_seStart(Z2SE_OBJ_MAGNEARM_SWING, &mSeMarmSwingPos, 0, 0);
 }
 
 /* ############################################################################################## */
@@ -1218,10 +1239,10 @@ int daObjMarm_c::Draw() {
     mDoExt_modelUpdateDL(mpModel[4]);
 
     GXColor color = {0, 0, 0, 0};
-    mRope1->update(field_0xA28, 25.5f, color, 0, &tevStr);
-    dComIfGd_set3DlineMat(mRope1);
-    mRope2->update(field_0xA29, 25.5f, color, 0, &tevStr);
-    dComIfGd_set3DlineMat(mRope2);
+    mpRope1->update(field_0xA28, 25.5f, color, 0, &tevStr);
+    dComIfGd_set3DlineMat(mpRope1);
+    mpRope2->update(field_0xA29, 25.5f, color, 0, &tevStr);
+    dComIfGd_set3DlineMat(mpRope2);
 
     cXyz offset1;
     cXyz offset2(0.0f, -800.0f, 0.0f);
@@ -1287,9 +1308,6 @@ static int daObjMarm_MoveBGDraw(daObjMarm_c* i_this) {
 }
 
 /* ############################################################################################## */
-/* 80592977-8059297E 00012F 0007+00 0/0 0/0 0/0 .rodata          None */
-SECTION_DEAD static char const* const stringBase_80592977 = "D_MN54";
-
 /* 80592C6C-80592C8C -00001 0020+00 1/0 0/0 0/0 .data            daObjMarm_METHODS */
 static actor_method_class daObjMarm_METHODS = {
     (process_method_func)daObjMarm_create1st,
